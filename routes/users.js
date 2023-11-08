@@ -1,6 +1,22 @@
 import express from 'express'
-import { SendOtp, verifyOTP, LoginUser, logoutUser } from '../controller/userController.js';
-
+import {
+    SendOtp,
+    verifyOTP,
+    LoginUser,
+    logoutUser,
+    addHome,
+    HomeList,
+    SingleHomeList,
+    ForgotSendOtp,
+    verifyforgotOTP,
+    ResetPassword,
+    SingleHomeListuser,
+    DeleteHomeList,
+    AddFavorites,
+    RemoveFavorites,
+    getFavoriteHome
+} from '../controller/userController.js';
+import { Authentication } from '../middleware/auth.js';
 
 const userRoute = express.Router();
 
@@ -8,5 +24,20 @@ userRoute.post("/sendotp", SendOtp);
 userRoute.post('/verifyotp', verifyOTP);
 userRoute.post("/login", LoginUser);
 userRoute.post('/logout', logoutUser);
+userRoute.post("/forgotsendotp", ForgotSendOtp);
+userRoute.post('/verifyotpfogot', verifyforgotOTP);
+userRoute.post('/passwordReset', ResetPassword);
 
+
+
+userRoute.post('/addhome', Authentication, addHome);
+userRoute.get('/getHomeList', HomeList);
+userRoute.get('/getListingById/:id', SingleHomeList);
+userRoute.get('/getHomeListSingle', Authentication, SingleHomeListuser);
+userRoute.delete('/listdelete/:id', Authentication, DeleteHomeList);
+
+
+userRoute.post('/addfavorites', Authentication, AddFavorites);
+userRoute.delete('/removefavorites', Authentication, RemoveFavorites);
+userRoute.get('/getFavoriteHomeList', Authentication, getFavoriteHome);
 export default userRoute;

@@ -3,6 +3,7 @@ import User from '../models/userSchema.js'
 import Category from '../models/categoryModel.js';
 
 import { adminToken } from '../middleware/auth.js';
+import Home from '../models/homeModel.js';
 
 let credentials = {
     email: "admin@gmail.com",
@@ -60,6 +61,8 @@ export const logoutAdmin = (req, res) => {
     });
     res.status(200).json({ message: 'Logged out successfully' });
 };
+
+
 export const clientListGet = async (req, res) => {
     try {
         const clientData = await User.find()
@@ -127,6 +130,34 @@ export const unBlockUser = async (req, res) => {
 }
 
 
+
+
+export const categoryListGet = async (req, res) => {
+    try {
+        const categoryData = await Category.find()
+        res.json(categoryData);
+    } catch (error) {
+        console.log(error);
+    }
+}
+
+export const homeListGet = async (req, res) => {
+    try {
+        const homeData = await Home.find({ status: "false" })
+        res.json(homeData);
+    } catch (error) {
+        console.log(error);
+    }
+}
+export const homeListGetverified = async (req, res) => {
+    try {
+        const homeDatas = await Home.find({ status: "true" })
+        res.json(homeDatas);
+    } catch (error) {
+        console.log(error);
+    }
+}
+
 export const AddCategory = async (req, res) => {
 
     const categoryName = req.body.name;
@@ -148,5 +179,25 @@ export const AddCategory = async (req, res) => {
         }
     } catch (error) {
         console.log(error.message);
+    }
+}
+
+
+
+
+export const homeVerify = async (req, res) => {
+    console.log("hello block user")
+
+    try {
+        const home = await Home.findByIdAndUpdate(req.params.id)
+        if (!home) {
+            res.status(401).json({ message: "home does not exist" })
+        }
+        home.status = true
+        const b = await home.save()
+        res.json({ message: "Home verified  successfully" })
+    }
+    catch (error) {
+        console.log(error.message)
     }
 }
