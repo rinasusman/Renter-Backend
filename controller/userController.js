@@ -275,9 +275,44 @@ export const addHome = async (req, res) => {
 
 export const HomeList = async (req, res) => {
   try {
-    const homeDatas = await Home.find({ status: "true" })
+    const category = req.query.category;
 
-    res.json(homeDatas);
+
+    let homeDatas
+
+    if (category) {
+      homeDatas = await Home.find({ status: "true", category })
+    } else {
+      homeDatas = await Home.find({ status: "true" })
+    }
+
+
+
+    res.json(homeDatas)
+  } catch (error) {
+    console.log(error);
+  }
+}
+
+
+export const SearchHomeList = async (req, res) => {
+  try {
+
+    const { location, startDate, endDate, guestCount, roomCount, bathroomCount } = req.query;
+
+    let homeDatas
+    if (location || startDate || endDate || guestCount || roomCount || roomCount) {
+      const regex = new RegExp(location, 'i')
+      homeDatas = await Home.find({ status: "true", location: { $regex: regex }, guestCount: { $gte: guestCount }, roomCount: { $gte: roomCount }, bathroomCount: { $gte: bathroomCount } })
+    }
+    else {
+      homeDatas = await Home.find({ status: "true" })
+    }
+
+
+
+
+    res.json(homeDatas)
   } catch (error) {
     console.log(error);
   }

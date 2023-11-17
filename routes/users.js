@@ -14,7 +14,8 @@ import {
     DeleteHomeList,
     AddFavorites,
     RemoveFavorites,
-    getFavoriteHome
+    getFavoriteHome,
+    SearchHomeList
 } from '../controller/userController.js';
 import { Authentication } from '../middleware/auth.js';
 
@@ -35,6 +36,7 @@ userRoute.get('/getHomeList', HomeList);
 userRoute.get('/getListingById/:id', SingleHomeList);
 userRoute.get('/getHomeListSingle', Authentication, SingleHomeListuser);
 userRoute.delete('/listdelete/:id', Authentication, DeleteHomeList);
+userRoute.get('/getSearchHomeList', SearchHomeList);
 
 
 userRoute.post('/addfavorites', Authentication, AddFavorites);
