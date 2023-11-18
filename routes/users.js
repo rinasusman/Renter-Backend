@@ -15,7 +15,9 @@ import {
     AddFavorites,
     RemoveFavorites,
     getFavoriteHome,
-    SearchHomeList
+    SearchHomeList,
+    bookHome,
+    checkbookHome
 } from '../controller/userController.js';
 import { Authentication } from '../middleware/auth.js';
 
@@ -42,4 +44,9 @@ userRoute.get('/getSearchHomeList', SearchHomeList);
 userRoute.post('/addfavorites', Authentication, AddFavorites);
 userRoute.delete('/removefavorites', Authentication, RemoveFavorites);
 userRoute.get('/getFavoriteHomeList', Authentication, getFavoriteHome);
+
+
+userRoute.post('/bookhome', Authentication, bookHome);
+userRoute.post('/checkBooking', Authentication, checkbookHome);
+
 export default userRoute;

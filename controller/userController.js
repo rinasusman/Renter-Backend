@@ -4,6 +4,9 @@ import nodemailer from 'nodemailer';
 import { generateAuthToken } from '../middleware/auth.js';
 import Home from '../models/homeModel.js';
 import Favorites from '../models/favoritesModel.js';
+import Booking from '../models/bookingModel.js';
+
+
 
 let saveOtp;
 let name;
@@ -493,3 +496,67 @@ export const getFavoriteHome = async (req, res) => {
   }
 }
 
+
+
+export const bookHome = async (req, res) => {
+  try {
+    console.log('Request received');
+    const { user } = req;
+    const {
+      startDate,
+      endDate,
+      totalPrice,
+      paymentType,
+      homeid
+    } = req.body;
+    console.log(req.body, "body:");
+    const existingBooking = await Booking.findOne({
+      'item.home': homeid,
+      startDate: { $lte: endDate },
+      endDate: { $gte: startDate }
+    });
+
+    if (existingBooking) {
+      return res.status(400).json({ message: 'A home with the same date already booked' });
+    }
+
+    // If no existing home with the same title, create and save the new home
+    const newBooking = new Booking({
+      userId: user._id,
+      item: [{ home: homeid }],
+      totalPrice: totalPrice,
+      startDate: startDate,
+      endDate: endDate,
+      bookingDate: Date.now(),
+      paymentType: paymentType,
+      status: "Booked"
+    });
+    console.log('Before saving the new booking');
+    await newBooking.save();
+    console.log('After saving the new booking')
+    console.log(newBooking, "booking::::")
+    // Send a success response
+    res.status(201).json({ message: 'Home booked successfully' });
+  } catch (error) {
+    // Handle other errors and send an error response
+    console.error(error);
+    res.status(500).json({ message: 'Failed to book a home' });
+  }
+};
+
+
+export const checkbookHome = async (req, res) => {
+  const { startDate, endDate, homeid } = req.body;
+
+  const existingBooking = await Booking.findOne({
+    'item.home': homeid,
+    startDate: { $lte: endDate },
+    endDate: { $gte: startDate }
+
+  });
+  if (existingBooking) {
+    res.json({ isBooked: true });
+  } else {
+    res.json({ isBooked: false });
+  }
+}

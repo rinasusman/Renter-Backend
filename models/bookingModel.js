@@ -19,13 +19,13 @@ const bookingModel = new mongoose.Schema(
             required: true,
         },
         startDate: {
-            type: Date,
-            required: true,
+            type: String,
+
 
         },
-        endtDate: {
-            type: Date,
-            required: true,
+        endDate: {
+            type: String,
+
         },
         bookingDate: {
             type: Date,
