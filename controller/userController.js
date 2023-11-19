@@ -5,7 +5,7 @@ import { generateAuthToken } from '../middleware/auth.js';
 import Home from '../models/homeModel.js';
 import Favorites from '../models/favoritesModel.js';
 import Booking from '../models/bookingModel.js';
-
+import Feedback from '../models/feedbackModel.js';
 
 
 let saveOtp;
@@ -484,9 +484,11 @@ export const getFavoriteHome = async (req, res) => {
     console.log(listings, "fav:..........");
 
     if (listings.length > 0) {
-      const detailsData = listings.map((favorite) => favorite.item[0].home);
-      console.log("data:", detailsData);
-      res.status(200).json(detailsData);
+      const detailsData = listings.map((favorite) => favorite.item);
+      console.log("detadata:", detailsData);
+      const fav = detailsData[0].map((item) => item.home)
+      console.log("data:", fav);
+      res.status(200).json(fav);
     } else {
       res.status(404).json({ message: 'No favorite listings found' });
     }
@@ -558,5 +560,84 @@ export const checkbookHome = async (req, res) => {
     res.json({ isBooked: true });
   } else {
     res.json({ isBooked: false });
+  }
+}
+
+
+
+
+export const getBookingHome = async (req, res) => {
+  const { user } = req;
+  console.log(user, "user:......");
+
+  try {
+    const listings = await Booking.find({
+      userId: user._id,
+    }).populate({
+      path: 'item.home',
+      select: 'location title imageSrc', // Add other fields as needed
+    });
+    console.log(listings, "Book:..........");
+
+    if (listings.length > 0) {
+      const detailsData = listings.map((booking) => ({
+        home: {
+          id: booking.item?.[0]?.home?._id ?? 'N/A',
+          location: booking.item?.[0]?.home?.location ?? 'N/A',
+          title: booking.item?.[0]?.home?.title ?? 'N/A',
+          imageSrc: booking.item?.[0]?.home?.imageSrc ?? 'N/A',
+        },
+        startDate: booking.startDate ?? 'N/A',
+        endDate: booking.endDate ?? 'N/A',
+        status: booking.status ?? 'N/A'
+      }));
+      console.log("detadata:", detailsData);
+
+      res.status(200).json(detailsData);
+    } else {
+      res.status(404).json({ message: 'No Booking listings found' });
+    }
+  } catch (error) {
+    console.error('Error fetching home details:', error);
+    res.status(500).json({ message: 'Internal Server Error' });
+  }
+}
+
+
+
+
+
+
+export const Feedbackpost = async (req, res) => {
+  try {
+    const { user } = req;
+    console.log(user, "user:......");
+    const { homeId, star, feedback } = req.body;
+    const newFeedback = new Feedback({
+      userId: user._id,
+      homeId: homeId,
+      star: star,
+      feedback: feedback,
+    });
+    const savedFeedback = await newFeedback.save();
+    res.json(savedFeedback);
+  } catch (error) {
+    console.error('Error saving feedback:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+
+
+}
+
+
+export const FeedbackByHome = async (req, res) => {
+  try {
+    const itemId = req.params.id;
+    const feedback = await Feedback.find({ homeId: itemId }).populate('userId');
+    res.json(feedback);
+    console.log(feedback, "feedback::::")
+  } catch (error) {
+    console.error('Error fetching feedback data:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
   }
 }

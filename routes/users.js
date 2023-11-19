@@ -17,7 +17,10 @@ import {
     getFavoriteHome,
     SearchHomeList,
     bookHome,
-    checkbookHome
+    checkbookHome,
+    getBookingHome,
+    Feedbackpost,
+    FeedbackByHome
 } from '../controller/userController.js';
 import { Authentication } from '../middleware/auth.js';
 
@@ -48,5 +51,8 @@ userRoute.get('/getFavoriteHomeList', Authentication, getFavoriteHome);
 
 userRoute.post('/bookhome', Authentication, bookHome);
 userRoute.post('/checkBooking', Authentication, checkbookHome);
+userRoute.get('/getbookhome', Authentication, getBookingHome);
+userRoute.post('/feedback', Authentication, Feedbackpost);
+userRoute.get('/getFeedbackByHome/:id', FeedbackByHome);
 
 export default userRoute;
