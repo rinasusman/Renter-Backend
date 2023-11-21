@@ -6,6 +6,7 @@ const homeModel = new mongoose.Schema(
             type: mongoose.Schema.Types.ObjectId,
             ref: 'users',
         },
+
         category: {
             type: String,
             required: true,
@@ -30,6 +31,10 @@ const homeModel = new mongoose.Schema(
             type: String,
             required: true,
         },
+        imageUrl: {
+            type: Array,
+            required: true,
+        },
         title: {
             type: String,
             required: true,
@@ -45,6 +50,10 @@ const homeModel = new mongoose.Schema(
         status: {
             type: Boolean,
             required: false
+        },
+        isDeleted: {
+            type: Boolean,
+            default: false
         }
     },
 );

@@ -8,6 +8,9 @@ import Booking from '../models/bookingModel.js';
 import Feedback from '../models/feedbackModel.js';
 
 
+
+
+
 let saveOtp;
 let name;
 let email;
@@ -603,7 +606,32 @@ export const getBookingHome = async (req, res) => {
   }
 }
 
+export const getreservationHome = async (req, res) => {
+  const { user } = req;
 
+
+  try {
+    const userHomes = await Home.find({
+      userId: user._id,
+      status: true
+    });
+    console.log(userHomes, "userhomes::::")
+    const homeIds = userHomes.map(home => home._id);
+    console.log(homeIds, "home::::")
+    const bookings = await Booking.find({ 'item.home': { $in: homeIds } }).populate({
+      path: 'item.home',
+      select: 'location title imageSrc',
+    }).populate({
+      path: 'userId',
+      select: 'name',
+    });;
+    console.log(bookings, "bookkkkkk:")
+    res.status(200).json(bookings);
+  } catch (error) {
+    console.error('Error fetching home details:', error);
+    res.status(500).json({ message: 'Internal Server Error' });
+  }
+}
 
 
 
@@ -618,6 +646,7 @@ export const Feedbackpost = async (req, res) => {
       homeId: homeId,
       star: star,
       feedback: feedback,
+      createDate: Date.now(),
     });
     const savedFeedback = await newFeedback.save();
     res.json(savedFeedback);
@@ -639,5 +668,40 @@ export const FeedbackByHome = async (req, res) => {
   } catch (error) {
     console.error('Error fetching feedback data:', error);
     res.status(500).json({ error: 'Internal Server Error' });
+  }
+}
+
+
+export const updatestatusreservation = async (req, res) => {
+  const { id } = req.params;
+  const { status } = req.body;
+  try {
+
+    const updatedBooking = await Booking.findByIdAndUpdate(
+      id,
+      { $set: { status } },
+      { new: true }
+    );
+    if (!updatedBooking) {
+      return res.status(404).json({ message: 'Booking not found' });
+    }
+    res.status(200).json(updatedBooking);
+  } catch (error) {
+    console.error('Error updating status:', error);
+    res.status(500).json({ message: 'Internal Server Error' });
+  }
+}
+
+export const updateedithome = async (req, res) => {
+  try {
+    const { id } = req.params;
+    console.log('Updating home with ID:', id);
+    const updatedHome = await Home.findByIdAndUpdate(id, { ...req.body, imageUrl: req.body.imageUrls }, { new: true });
+
+    res.json(updatedHome);
+    console.log(updatedHome, "updateHome::")
+  } catch (error) {
+    console.error('Error updating home:', error);
+    res.status(500).json({ error: 'Internal server error' });
   }
 }

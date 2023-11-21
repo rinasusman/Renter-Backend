@@ -20,7 +20,10 @@ import {
     checkbookHome,
     getBookingHome,
     Feedbackpost,
-    FeedbackByHome
+    FeedbackByHome,
+    getreservationHome,
+    updatestatusreservation,
+    updateedithome
 } from '../controller/userController.js';
 import { Authentication } from '../middleware/auth.js';
 
@@ -42,6 +45,8 @@ userRoute.get('/getListingById/:id', SingleHomeList);
 userRoute.get('/getHomeListSingle', Authentication, SingleHomeListuser);
 userRoute.delete('/listdelete/:id', Authentication, DeleteHomeList);
 userRoute.get('/getSearchHomeList', SearchHomeList);
+userRoute.put('/edithomes/:id', updateedithome);
+
 
 
 userRoute.post('/addfavorites', Authentication, AddFavorites);
@@ -54,5 +59,11 @@ userRoute.post('/checkBooking', Authentication, checkbookHome);
 userRoute.get('/getbookhome', Authentication, getBookingHome);
 userRoute.post('/feedback', Authentication, Feedbackpost);
 userRoute.get('/getFeedbackByHome/:id', FeedbackByHome);
+
+userRoute.get('/reservationhome', Authentication, getreservationHome);
+userRoute.put('/statusbookings/:id', updatestatusreservation);
+
+
+
 
 export default userRoute;

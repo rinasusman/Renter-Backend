@@ -9,7 +9,10 @@ import {
     categoryListGet,
     homeListGet,
     homeListGetverified,
-    homeVerify
+    homeVerify,
+    BookingListGet,
+    HomesListGet,
+    HomesUnListGet
 } from '../controller/adminController.js'
 import { adminToken } from '../middleware/auth.js'
 
@@ -27,6 +30,12 @@ adminRouter.get("/getCategoryList", categoryListGet);
 adminRouter.get("/getHomeList", homeListGet);
 adminRouter.get("/getHomeListverified", homeListGetverified);
 adminRouter.put('/homeverify/:id', homeVerify);
+
+
+adminRouter.get("/getBookingList", BookingListGet);
+
+adminRouter.get("/homeList/:id", HomesListGet);
+adminRouter.get("/homeUnList/:id", HomesUnListGet);
 
 
 export default adminRouter; 

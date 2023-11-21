@@ -1,7 +1,7 @@
 import bcrypt from 'bcrypt'
 import User from '../models/userSchema.js'
 import Category from '../models/categoryModel.js';
-
+import Booking from '../models/bookingModel.js';
 import { adminToken } from '../middleware/auth.js';
 import Home from '../models/homeModel.js';
 
@@ -196,6 +196,63 @@ export const homeVerify = async (req, res) => {
         home.status = true
         const b = await home.save()
         res.json({ message: "Home verified  successfully" })
+    }
+    catch (error) {
+        console.log(error.message)
+    }
+}
+
+
+
+
+export const BookingListGet = async (req, res) => {
+    try {
+        const BookingData = await Booking.find().populate({
+            path: 'item.home',
+            select: 'location title imageSrc',
+        }).populate({
+            path: 'userId',
+            select: 'name',
+        });
+        res.json(BookingData);
+        console.log(BookingData, "BookingData:")
+    } catch (error) {
+        console.log(error);
+    }
+}
+
+
+
+
+export const HomesListGet = async (req, res) => {
+    const id = req.params.id;
+    console.log(id, "id:")
+
+    try {
+        const user = await Home.findByIdAndUpdate(id)
+        if (!user) {
+            res.status(401).json({ message: "user does not exist" })
+        }
+        user.isDeleted = false
+        await user.save();
+        res.json({ message: "user List successfully" })
+    }
+    catch (error) {
+        console.log(error.message)
+    }
+}
+
+export const HomesUnListGet = async (req, res) => {
+    const id = req.params.id;
+
+    try {
+        const user = await Home.findByIdAndUpdate(id)
+        if (!user) {
+            res.status(401).json({ message: "user does not exist" })
+        }
+        user.isDeleted = true
+        await user.save();
+        res.json({ message: "user UnList successfully" })
     }
     catch (error) {
         console.log(error.message)

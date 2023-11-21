@@ -3,9 +3,8 @@ import mongoose from "mongoose";
 const feedbackModel = new mongoose.Schema(
     {
         userId: {
-            type: mongoose.Types.ObjectId,
-            ref: "users",
-            required: true,
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'users',
         },
 
         homeId: {
@@ -21,6 +20,10 @@ const feedbackModel = new mongoose.Schema(
         feedback: {
             type: String,
             required: true,
+        },
+        createDate: {
+            type: Date,
+            default: Date.now()
         },
 
     },
