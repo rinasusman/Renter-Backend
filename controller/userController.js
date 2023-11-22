@@ -578,7 +578,7 @@ export const getBookingHome = async (req, res) => {
       userId: user._id,
     }).populate({
       path: 'item.home',
-      select: 'location title imageSrc', // Add other fields as needed
+      select: 'location title imageSrc',
     });
     console.log(listings, "Book:..........");
 
@@ -636,6 +636,139 @@ export const getreservationHome = async (req, res) => {
 
 
 
+
+export const getearningsHome = async (req, res) => {
+  const { user } = req;
+
+
+  try {
+    const userHomes = await Home.find({
+      userId: user._id,
+      status: true
+    });
+    const homeIds = userHomes.map(home => home._id);
+
+    const bookings = await Booking.find({ 'item.home': { $in: homeIds } }).populate({
+      path: 'item.home',
+      select: 'location title imageSrc',
+    })
+    const sumResult = await Booking.aggregate([
+      {
+        $match: {
+          'item.home': { $in: homeIds },
+        },
+      },
+      {
+        $group: {
+          _id: null,
+          totalPrice: { $sum: { $toDouble: "$totalPrice" } },
+        },
+      },
+    ]);
+
+
+    const totalEarnings = sumResult.length > 0 ? sumResult[0].totalPrice : 0;
+
+    console.log(totalEarnings, "totalEarnings");
+
+    const totalBookings = bookings.length;
+    console.log(totalBookings, "totalBookings")
+
+
+    res.status(200).json({ totalEarnings, totalBookings });
+  } catch (error) {
+    console.error('Error fetching home details:', error);
+    res.status(500).json({ message: 'Internal Server Error' });
+  }
+}
+export const getbookingHome = async (req, res) => {
+  const { user } = req;
+
+
+  try {
+    const userHomes = await Home.find({
+      userId: user._id,
+      status: true
+    });
+    const homeIds = userHomes.map(home => home._id);
+
+    const bookings = await Booking.find({ 'item.home': { $in: homeIds } }).populate({
+      path: 'item.home',
+      select: 'location title imageSrc',
+    })
+    const dailyBookings = await Booking.aggregate([
+      {
+        $match: {
+          'item.home': { $in: homeIds },
+        },
+      },
+      {
+        $group: {
+          _id: {
+            date: { $dateToString: { format: "%Y-%m-%d", date: "$bookingDate" } },
+            status: "$status",
+          },
+          count: { $sum: 1 }, totalPrice: { $sum: { $toDouble: "$totalPrice" } },
+        },
+      },
+      {
+        $group: {
+          _id: "$_id.date",
+          totalBookings: {
+            $sum: {
+              $cond: {
+                if: { $eq: ["$_id.status", "Booked"] },
+                then: "$count",
+                else: 0,
+              },
+            },
+          },
+          totalCheckins: {
+            $sum: {
+              $cond: {
+                if: { $eq: ["$_id.status", "Checkin"] },
+                then: "$count",
+                else: 0,
+              },
+            },
+          },
+          totalCheckout: {
+            $sum: {
+              $cond: {
+                if: { $eq: ["$_id.status", "Checkout"] },
+                then: "$count",
+                else: 0,
+              },
+            },
+          },
+          totalCancelled: {
+            $sum: {
+              $cond: {
+                if: { $eq: ["$_id.status", "Cancel"] },
+                then: "$count",
+                else: 0,
+              },
+            },
+          },
+          totalEarnings: {
+            $sum: "$totalPrice",
+          },
+        },
+      },
+    ]);
+
+
+    console.log(dailyBookings, "dailyBookings");
+
+    res.status(200).json({ dailyBookings });
+  } catch (error) {
+    console.error('Error fetching home details:', error);
+    res.status(500).json({ message: 'Internal Server Error' });
+  }
+}
+
+
+
 export const Feedbackpost = async (req, res) => {
   try {
     const { user } = req;
@@ -677,9 +810,12 @@ export const updatestatusreservation = async (req, res) => {
   const { status } = req.body;
   try {
 
+    let updateFields = { status };
+
+
     const updatedBooking = await Booking.findByIdAndUpdate(
       id,
-      { $set: { status } },
+      { $set: updateFields },
       { new: true }
     );
     if (!updatedBooking) {

@@ -23,7 +23,9 @@ import {
     FeedbackByHome,
     getreservationHome,
     updatestatusreservation,
-    updateedithome
+    updateedithome,
+    getearningsHome,
+    getbookingHome
 } from '../controller/userController.js';
 import { Authentication } from '../middleware/auth.js';
 
@@ -63,7 +65,8 @@ userRoute.get('/getFeedbackByHome/:id', FeedbackByHome);
 userRoute.get('/reservationhome', Authentication, getreservationHome);
 userRoute.put('/statusbookings/:id', updatestatusreservation);
 
-
+userRoute.get('/earnings', Authentication, getearningsHome);
+userRoute.get('/dailybook', Authentication, getbookingHome);
 
 
 export default userRoute;

@@ -31,6 +31,18 @@ const bookingModel = new mongoose.Schema(
             type: Date,
             default: Date.now()
         },
+        cancelDate: {
+            type: Date,
+
+        },
+        checkoutDate: {
+            type: Date,
+
+        },
+        checkinDate: {
+            type: Date,
+
+        },
         paymentType: {
             type: String,
         },
