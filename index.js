@@ -12,8 +12,9 @@ import adminRouter from "./routes/admin.js";
 const app = express();
 
 
+
 app.use(cors({
-  origin: 'http://localhost:3000', // Update this to the origin of your frontend application
+  origin: 'http://localhost:3000',
   credentials: true
 }));
 app.use(cookieParser());
