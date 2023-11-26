@@ -25,9 +25,12 @@ import {
     updatestatusreservation,
     updateedithome,
     getearningsHome,
-    getbookingHome
+    getbookingHome,
+    getUser
 } from '../controller/userController.js';
+import { createChat, getuserChat, findChat } from "../controller/chatController.js"
 import { Authentication } from '../middleware/auth.js';
+import { addMessage, getMessages } from '../controller/MessageController.js';
 
 const userRoute = express.Router();
 
@@ -68,5 +71,17 @@ userRoute.put('/statusbookings/:id', updatestatusreservation);
 userRoute.get('/earnings', Authentication, getearningsHome);
 userRoute.get('/dailybook', Authentication, getbookingHome);
 
+
+
+userRoute.post('/createChat', createChat);
+userRoute.get('/getchat/:userId', getuserChat);
+userRoute.get('/find/:firstId/:secondId', findChat);
+
+userRoute.post('/addMessage', addMessage);
+
+userRoute.get('/getmessage/:chatId', getMessages);
+
+
+userRoute.get('/user/:id', getUser);
 
 export default userRoute;

@@ -174,6 +174,7 @@ export const LoginUser = async (req, res, next) => {
     message: null,
     token: null,
     name: null,
+
   };
 
 
@@ -201,7 +202,7 @@ export const LoginUser = async (req, res, next) => {
           httpOnly: false,
         })
           .status(200)
-          .send({ userSignUp });
+          .send({ userSignUp: userSignUp, userdata: userExist });
 
       } else {
         userSignUp.Status = false;
@@ -228,7 +229,25 @@ export const logoutUser = (req, res) => {
   res.status(200).json({ message: 'Logged out successfully' });
 };
 
+export const getUser = async (req, res) => {
 
+  const id = req.params.id;
+  console.log(id, "id")
+  try {
+    const user = await User.findOne({ _id: id })
+
+    if (user) {
+
+
+      res.status(200).json(user);
+    } else {
+      res.status(404).json("No such User");
+    }
+  } catch (error) {
+
+  }
+
+}
 
 export const addHome = async (req, res) => {
   try {
