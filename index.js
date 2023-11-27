@@ -53,6 +53,8 @@ const io = new Server(server, {
 });
 let activeUsers = [];
 io.on("connection", (socket) => {
+
+  console.log("User connected:", socket.id);
   // add new User
   socket.on("new-user-add", (newUserId) => {
     // if user is not added previously
@@ -64,13 +66,13 @@ io.on("connection", (socket) => {
     io.emit("get-users", activeUsers);
     console.log("Sent online users:", activeUsers);
   });
-  // socket.on("disconnect", () => {
-  //   // remove user from active users
-  //   activeUsers = activeUsers.filter((user) => user.socketId !== socket.id);
-  //   console.log("User Disconnected", activeUsers);
-  //   // send all active users to all users
-  //   io.emit("get-users", activeUsers);
-  // });
+  socket.on("disconnect", () => {
+    // remove user from active users
+    activeUsers = activeUsers.filter((user) => user.socketId !== socket.id);
+    console.log("User Disconnected", activeUsers);
+    // send all active users to all users
+    io.emit("get-users", activeUsers);
+  });
   socket.on("send-message", (data) => {
     const { receiverId } = data;
     const user = activeUsers.find((user) => user.userId === receiverId);
