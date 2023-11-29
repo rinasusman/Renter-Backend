@@ -1,4 +1,4 @@
-import bcrypt from 'bcrypt'
+import moment from 'moment'
 import User from '../models/userSchema.js'
 import Category from '../models/categoryModel.js';
 import Booking from '../models/bookingModel.js';
@@ -202,9 +202,49 @@ export const homeVerify = async (req, res) => {
     }
 }
 
+export const earningsGet = async (req, res) => {
+    try {
+        const homeData = await Home.find({ status: "true" })
+        const totalHome = homeData.length
+        console.log(totalHome, "totalHome:")
+        const clientData = await User.find()
+        const totalUser = clientData.length
+        console.log(totalUser, "totalUser:")
+        const BookingData = await Booking.find()
+        const totalBooking = BookingData.length
+        console.log(totalBooking, "totalBooking:")
+        res.status(200).json({ totalHome, totalUser, totalBooking });
+    } catch (error) {
+        console.error('Error fetching home details:', error);
+        res.status(500).json({ message: 'Internal Server Error' });
+    }
+}
 
 
+export const pdfbookingGet = async (req, res) => {
+    console.log("enter pdf")
+    const { startDateString, endDateString } = req.query;
+    console.log(startDateString, "startdate:")
+    try {
 
+
+        const bookings = await Booking.find({
+            bookingDate: { $gte: startDateString, $lte: endDateString },
+        }).populate({
+            path: 'item.home',
+            select: 'location title imageSrc',
+        }).populate({
+            path: 'userId',
+            select: 'name',
+        });;
+
+        console.log(bookings, "pdf:::::::")
+        res.json(bookings);
+    } catch (error) {
+        console.error("Error fetching bookings:", error);
+        res.status(500).json({ error: "Internal Server Error" });
+    }
+}
 export const BookingListGet = async (req, res) => {
     try {
         const BookingData = await Booking.find().populate({
@@ -213,9 +253,11 @@ export const BookingListGet = async (req, res) => {
         }).populate({
             path: 'userId',
             select: 'name',
-        });
+        })
         res.json(BookingData);
+
         console.log(BookingData, "BookingData:")
+
     } catch (error) {
         console.log(error);
     }

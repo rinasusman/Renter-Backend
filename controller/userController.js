@@ -350,8 +350,16 @@ export const SingleHomeList = async (req, res) => {
   try {
     const listing = await Home.findById(itemId).populate('userId');
     console.log(listing, "dattttttttttttttta")
+    const booking = await Booking.find({ 'item.home': itemId })
+    console.log(booking, "bookingDetails::")
     if (listing) {
-      res.status(200).json(listing);
+      const bookingDetails = booking.map(booking => ({
+        startDate: booking.startDate,
+        endDate: booking.endDate,
+      }));
+
+      console.log("Booking Details:", bookingDetails);
+      res.status(200).json({ listing, bookingDetails });
     } else {
       res.status(404).json({ message: 'Listing not found' });
     }
@@ -645,6 +653,10 @@ export const getreservationHome = async (req, res) => {
       select: 'name',
     });;
     console.log(bookings, "bookkkkkk:")
+    bookings.forEach(booking => {
+      console.log("Start Date:", booking.startDate);
+      console.log("End Date:", booking.endDate);
+    });
     res.status(200).json(bookings);
   } catch (error) {
     console.error('Error fetching home details:', error);

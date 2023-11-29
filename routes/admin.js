@@ -12,7 +12,9 @@ import {
     homeVerify,
     BookingListGet,
     HomesListGet,
-    HomesUnListGet
+    HomesUnListGet,
+    earningsGet,
+    pdfbookingGet
 } from '../controller/adminController.js'
 import { adminToken } from '../middleware/auth.js'
 
@@ -36,6 +38,9 @@ adminRouter.get("/getBookingList", BookingListGet);
 
 adminRouter.get("/homeList/:id", HomesListGet);
 adminRouter.get("/homeUnList/:id", HomesUnListGet);
+
+adminRouter.get("/earnings", earningsGet);
+adminRouter.get("/pdfbooking", pdfbookingGet);
 
 
 export default adminRouter; 
