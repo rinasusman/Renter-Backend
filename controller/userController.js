@@ -619,7 +619,8 @@ export const getBookingHome = async (req, res) => {
         },
         startDate: booking.startDate ?? 'N/A',
         endDate: booking.endDate ?? 'N/A',
-        status: booking.status ?? 'N/A'
+        status: booking.status ?? 'N/A',
+        _id: booking._id ?? 'N/A'
       }));
       console.log("detadata:", detailsData);
 
@@ -687,6 +688,7 @@ export const getearningsHome = async (req, res) => {
       {
         $match: {
           'item.home': { $in: homeIds },
+          status: { $ne: 'Cancelled' }
         },
       },
       {
@@ -705,8 +707,10 @@ export const getearningsHome = async (req, res) => {
     const totalBookings = bookings.length;
     console.log(totalBookings, "totalBookings")
 
+    const userWithWallet = await User.findById(user._id).select('wallet');
+    const formattedUserWallet = parseFloat(userWithWallet.wallet).toFixed(2);
 
-    res.status(200).json({ totalEarnings, totalBookings });
+    res.status(200).json({ totalEarnings, totalBookings, userWallet: formattedUserWallet });
   } catch (error) {
     console.error('Error fetching home details:', error);
     res.status(500).json({ message: 'Internal Server Error' });
@@ -775,7 +779,7 @@ export const getbookingHome = async (req, res) => {
           totalCancelled: {
             $sum: {
               $cond: {
-                if: { $eq: ["$_id.status", "Cancel"] },
+                if: { $eq: ["$_id.status", "Cancelled"] },
                 then: "$count",
                 else: 0,
               },
@@ -871,4 +875,41 @@ export const updateedithome = async (req, res) => {
     console.error('Error updating home:', error);
     res.status(500).json({ error: 'Internal server error' });
   }
+}
+
+export const cancelBooking = async (req, res) => {
+  try {
+    const { bookingId } = req.params;
+    const { user } = req
+
+    console.log(bookingId, "bookingId:")
+    const booking = await Booking.findOneAndUpdate(
+      { _id: bookingId, userId: user._id, status: 'Booked' },
+      { $set: { status: 'Cancelled' } },
+      { new: true }
+    );
+    if (!booking) {
+      return res.status(404).json({ message: 'Booking not found or cannot be cancelled.' });
+    }
+    const users = await User.findById({ _id: user._id });
+    users.wallet += parseFloat(booking.totalPrice);
+    await users.save();
+    res.json({ message: 'Booking cancelled successfully.' });
+  } catch (error) {
+    console.error('Error cancelling booking:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+
+}
+
+export const getWallet = async (req, res) => {
+  const { user } = req;
+  try {
+    const userwallet = User.find()
+    console.log("userwallet:", userwallet)
+    res.json(userwallet);
+  } catch (error) {
+    console.log(error)
+  }
+
 }

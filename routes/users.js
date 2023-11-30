@@ -1,4 +1,5 @@
 import express from 'express'
+
 import {
     SendOtp,
     verifyOTP,
@@ -26,7 +27,9 @@ import {
     updateedithome,
     getearningsHome,
     getbookingHome,
-    getUser
+    getUser,
+    cancelBooking,
+    getWallet
 } from '../controller/userController.js';
 import { createChat, getuserChat, findChat } from "../controller/chatController.js"
 import { Authentication } from '../middleware/auth.js';
@@ -83,5 +86,9 @@ userRoute.get('/getmessage/:chatId', getMessages);
 
 
 userRoute.get('/user/:id', getUser);
+
+userRoute.put('/cancelbooking/:bookingId', Authentication, cancelBooking)
+userRoute.get('/ walletget', Authentication, getWallet);
+
 
 export default userRoute;

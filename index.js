@@ -8,7 +8,6 @@ import userRouter from './routes/users.js'
 import adminRouter from "./routes/admin.js";
 import { Server } from "socket.io";
 
-
 const app = express();
 
 
@@ -17,12 +16,11 @@ app.use(cors({
   origin: 'http://localhost:3000',
   credentials: true
 }));
+
+
 app.use(cookieParser());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-
-
-app.use(cookieParser());
 
 
 

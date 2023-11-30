@@ -283,12 +283,47 @@ export const HomesListGet = async (req, res) => {
         console.log(error.message)
     }
 }
+export const CategoryList = async (req, res) => {
+    const id = req.params.id;
+    console.log(id, "id:")
+
+    try {
+        const user = await Category.findByIdAndUpdate(id)
+        if (!user) {
+            res.status(401).json({ message: "user does not exist" })
+        }
+        user.isDeleted = false
+        await user.save();
+        res.json({ message: "user List successfully" })
+    }
+    catch (error) {
+        console.log(error.message)
+    }
+}
 
 export const HomesUnListGet = async (req, res) => {
     const id = req.params.id;
 
     try {
         const user = await Home.findByIdAndUpdate(id)
+        if (!user) {
+            res.status(401).json({ message: "user does not exist" })
+        }
+        user.isDeleted = true
+        await user.save();
+        res.json({ message: "user UnList successfully" })
+    }
+    catch (error) {
+        console.log(error.message)
+    }
+}
+
+
+export const CategoryUnList = async (req, res) => {
+    const id = req.params.id;
+
+    try {
+        const user = await Category.findByIdAndUpdate(id)
         if (!user) {
             res.status(401).json({ message: "user does not exist" })
         }
